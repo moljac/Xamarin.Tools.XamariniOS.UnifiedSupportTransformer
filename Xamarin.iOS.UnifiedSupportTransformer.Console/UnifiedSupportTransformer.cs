@@ -270,7 +270,7 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 						//......................................................
 						node_name = "IntermediateOutputPath";
 						elem = doc.CreateElement(node_name, xmlns_dummy);
-						elem.InnerText = @"obj\unified\$(Platform)\$(Configuration)\";
+						elem.InnerText = @"obj\classic\$(Platform)\$(Configuration)\";
 						//Add the node to the document.
 						n.InsertAfter(elem, n.LastChild);
 						//......................................................
@@ -279,7 +279,7 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 						//......................................................
 						node_name = "OutputPath";
 						elem = doc.CreateElement(node_name, xmlns_dummy);
-						elem.InnerText = @"bin\unified\$(Platform)\$(Configuration)\";
+						elem.InnerText = @"bin\classic\$(Platform)\$(Configuration)\";
 						//Add the node to the document.
 						n.InsertAfter(elem, n.LastChild);
 						//......................................................
