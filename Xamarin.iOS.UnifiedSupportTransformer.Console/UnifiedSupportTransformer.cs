@@ -87,7 +87,8 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 
 				// needed to supress empty xmlns="" when adding nodes
 				XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
-				ns.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
+				string xmlns_dummy = "http://schemas.microsoft.com/developer/msbuild/2003";
+				ns.AddNamespace("x", xmlns_dummy);
 
 				XmlNode root = doc.DocumentElement;
 
@@ -140,21 +141,49 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 					if (null != xa && xa.InnerText.Contains("Release"))
 					{
 						//Create a new node.
-						XmlElement elem = doc.CreateElement("DefineConstants", "http://schemas.microsoft.com/developer/msbuild/2003");
+						XmlElement elem = doc.CreateElement("DefineConstants", xmlns_dummy);
 						elem.InnerText = "__UNIFIED__;";
 
 						//Add the node to the document.
 						n.InsertAfter(elem, n.LastChild);
 					}
 
-					if (null != xa && (xa.InnerText.Contains("Release") || xa.InnerText.Contains("Debug")))
+					if
+						(
+							null != xa 
+							&&
+							(
+								xa.InnerText.Contains("Release") 
+								|| 
+								xa.InnerText.Contains("Debug")
+								||
+								xa.InnerText.Contains("AdHoc")
+								||
+								xa.InnerText.Contains("AppStore")
+								||
+								xa.InnerText.Contains("Ad-Hoc")
+							)
+						)
 					{
-						//Create a new node.
-						XmlElement elem = doc.CreateElement("IntermediateOutputPath", "http://schemas.microsoft.com/developer/msbuild/2003");
-						elem.InnerText = @"obj\unified\$(Configuration)\";
+						string node_name = "";
+						XmlElement elem = null;
 
+						//......................................................
+						node_name = "IntermediateOutputPath";
+						elem = doc.CreateElement(node_name, xmlns_dummy);
+						elem.InnerText = @"obj\unified\$(Platform)\$(Configuration)\";
+						//Add the node to the document.
+						n.InsertAfter(elem, n.LastChild);						
+						//......................................................
+
+
+						//......................................................
+						node_name = "OutputPath";
+						elem = doc.CreateElement(node_name, xmlns_dummy);
+						elem.InnerText = @"bin\unified\$(Platform)\$(Configuration)\";
 						//Add the node to the document.
 						n.InsertAfter(elem, n.LastChild);
+						//......................................................
 					}
 
 				}
@@ -206,7 +235,8 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 
 				// needed to supress empty xmlns="" when adding nodes
 				XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
-				ns.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
+				string xmlns_dummy = "http://schemas.microsoft.com/developer/msbuild/2003";
+				ns.AddNamespace("x", xmlns_dummy);
 
 				XmlNode root = doc.DocumentElement;
 
@@ -218,14 +248,41 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 				{
 					XmlNode n = property_groups[i];
 					XmlAttribute xa = n.Attributes["Condition"];
-					if (null != xa && (xa.InnerText.Contains("Release") || xa.InnerText.Contains("Debug")))
+					if 
+						(
+							null != xa 
+							&&
+							(
+								xa.InnerText.Contains("Release") 
+								|| 
+								xa.InnerText.Contains("Debug")
+								||
+								xa.InnerText.Contains("AdHoc")
+								||
+								xa.InnerText.Contains("AppStore")
+								||
+								xa.InnerText.Contains("Ad-Hoc")
+							)
+						)
 					{
-						//Create a new node.
-						XmlElement elem = doc.CreateElement("IntermediateOutputPath", "http://schemas.microsoft.com/developer/msbuild/2003");
-						elem.InnerText = @"obj\classic\$(Configuration)\";
-
+						string node_name = "";
+						XmlElement elem = null;
+						//......................................................
+						node_name = "IntermediateOutputPath";
+						elem = doc.CreateElement(node_name, xmlns_dummy);
+						elem.InnerText = @"obj\unified\$(Platform)\$(Configuration)\";
 						//Add the node to the document.
 						n.InsertAfter(elem, n.LastChild);
+						//......................................................
+
+
+						//......................................................
+						node_name = "OutputPath";
+						elem = doc.CreateElement(node_name, xmlns_dummy);
+						elem.InnerText = @"bin\unified\$(Platform)\$(Configuration)\";
+						//Add the node to the document.
+						n.InsertAfter(elem, n.LastChild);
+						//......................................................
 					}
 				}
 				//---------------------------------------------------------------------
