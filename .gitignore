@@ -181,3 +181,24 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
+
+
+#==============================================================================
+# HolisticWare
+
+**/.DS_Store
+**/.svn
+docs/workspace/sharpen/**
+**/*.userprefs
+src/samples/Components/**
+**/Components/
+**/packages/
+**/.git*
+**/.git.*/*
+
+**/UpgradeLog.htm
+
+
+**/*.data.bat
+**/*.data.sh

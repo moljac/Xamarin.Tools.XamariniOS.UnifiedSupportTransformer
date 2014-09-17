@@ -92,9 +92,17 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 				XmlNode root = doc.DocumentElement;
 
 				//---------------------------------------------------------------------
+				XmlNodeList project_guids = doc.GetElementsByTagName("ProjectGuid");
+				XmlNode node_project_guid = project_guids[0];
+				Guid guid = Guid.NewGuid();
+				string guid_txt = guid.ToString();
+				node_project_guid.InnerText = "{" + guid_txt.ToUpper() + "}";
+				//---------------------------------------------------------------------
+
+				//---------------------------------------------------------------------
 				XmlNodeList project_type_guids = doc.GetElementsByTagName("ProjectTypeGuids");
-				XmlNode node1 = project_type_guids[0];
-				node1.InnerText = "{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
+				XmlNode node_type_project_guid = project_type_guids[0];
+				node_type_project_guid.InnerText = "{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
 				//---------------------------------------------------------------------
 
 				//---------------------------------------------------------------------
