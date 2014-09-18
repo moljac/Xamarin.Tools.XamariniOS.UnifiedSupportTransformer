@@ -4,30 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.Diagnostics;
+
 namespace Xamarin.iOS.UnifiedSupportTransformer
 {
 	class Program
 	{
 		static void Main(string[] args)
 		{
-			var options = new Options();
+			var options = new UnifiedSupportTransformerCommandLineOptions();
+
 			if (CommandLine.Parser.Default.ParseArguments(args, options))
 			{
-				// Values are available here
-				if (options.Verbose)
-				{
-					Console.WriteLine("Filename: {0}", options.InputFile);
-				}
+				Debug.WriteLine("Filename: {0}", options.Input);
+				Debug.WriteLine("Filename: {0}", options.Output);
+					
+				UnifiedSupportTransformer ust = new UnifiedSupportTransformer();
+
+				ust.TransformOriginalsToDestination(options.Input, options.Output);
+
 			}
-
-
-			UnifiedSupportTransformer ust = new UnifiedSupportTransformer();
-
-			string[] projects = ust.ProjectFiles();
-
-			ust.CopyProjects();
-			ust.TransformProjectsUnified();
-			ust.TransformProjectsClassic();
 
 			return;
 		}

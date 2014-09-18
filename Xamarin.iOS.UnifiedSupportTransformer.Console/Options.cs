@@ -9,14 +9,8 @@ using CommandLine.Text;
 
 namespace Xamarin.iOS.UnifiedSupportTransformer
 {
-	public partial class Options
+	public partial class UnifiedSupportTransformerCommandLineOptions
 	{
-		[Option('l', "library", Required = true, HelpText = "classic library")]
-		public string InputFile { get; set; }
-
-		[Option('s', "sample", Required=true, HelpText = "classic sample")]
-		public bool Verbose { get; set; }
-
 		[ParserState]
 		public IParserState LastParserState { get; set; }
 
@@ -26,5 +20,12 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 			return HelpText.AutoBuild(this,
 			  (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
 		}
+
+		[Option('i', "input", Required = false, HelpText = "Input csproj file[s] or folder containing csproj files")]
+		public string Input { get; set; }
+
+		[Option('o', "output", Required = false, HelpText = "Folder which will contain transformed csproj files")]
+		public string Output { get; set; }
+
 	}
 }
