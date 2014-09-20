@@ -8,6 +8,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 
+using HolisticWare.IDE.VisualStudio;
+
 namespace Xamarin.iOS.UnifiedSupportTransformer
 {
 	public partial class UnifiedSupportTransformer
@@ -15,6 +17,7 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 		string source_folder = null;
 		string destination_folder = null;
 
+		ProjectTypes project_types = ProjectTypes.GetProjectTypes();
 		public void TransformOriginalsToDestination (string input, string output)
 		{
 			if (null == input || "" == input)
@@ -29,7 +32,7 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 
 			// file attributes for file or directory
 			FileAttributes attr_input = File.GetAttributes (input);
-			FileAttributes attr_output = File.GetAttributes (input);
+			FileAttributes attr_output = File.GetAttributes (output);
 
 			bool input_is_file = (attr_input & FileAttributes.Normal) == FileAttributes.Normal;
 			bool output_is_file = (attr_output & FileAttributes.Normal) == FileAttributes.Normal;
@@ -236,14 +239,14 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 					//......................................................
 					node_name = "IntermediateOutputPath";
 					elem = doc.CreateElement (node_name, xmlns_dummy);
-					elem.InnerText = @"obj\unified\$(Platform)\$(Configuration)\";
+					elem.InnerText = @"obj\unified\%24%28Platform%29\%24%28Configuration%29\";
 					//Add the node to the document.
 					n.InsertAfter (elem, n.LastChild);
 					//......................................................
 					//......................................................
 					node_name = "OutputPath";
 					elem = doc.CreateElement (node_name, xmlns_dummy);
-					elem.InnerText = @"bin\unified\$(Platform)\$(Configuration)\";
+					elem.InnerText = @"bin\unified\%24%28Platform%29\%24%28Configuration%29\";
 					//Add the node to the document.
 					n.InsertAfter (elem, n.LastChild);
 					//......................................................
@@ -277,14 +280,14 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 					//......................................................
 					node_name = "IntermediateOutputPath";
 					elem = doc.CreateElement (node_name, xmlns_dummy);
-					elem.InnerText = @"obj\classic\$(Platform)\$(Configuration)\";
+					elem.InnerText = @"obj\classic\%24%28Platform%29\%24%28Configuration%29\";
 					//Add the node to the document.
 					n.InsertAfter (elem, n.LastChild);
 					//......................................................
 					//......................................................
 					node_name = "OutputPath";
 					elem = doc.CreateElement (node_name, xmlns_dummy);
-					elem.InnerText = @"bin\classic\$(Platform)\$(Configuration)\";
+					elem.InnerText = @"bin\classic\%24%28Platform%29\%24%28Configuration%29\";
 					//Add the node to the document.
 					n.InsertAfter (elem, n.LastChild);
 					//......................................................
