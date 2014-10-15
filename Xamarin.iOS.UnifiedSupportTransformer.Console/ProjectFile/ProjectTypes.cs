@@ -22,6 +22,23 @@ namespace HolisticWare.IDE.VisualStudio
 										, StringSplitOptions.RemoveEmptyEntries
 										);
 
+			foreach (string l in lines)
+			{
+				string l_trimmed = l.Trim();
+
+				if (l_trimmed == String.Empty || l_trimmed.StartsWith(@"//"))
+				{
+					continue;
+				}
+				else
+				{
+					int position_guid_begin = l_trimmed.IndexOf('{');
+					int position_guid_end = l_trimmed.IndexOf('}');
+					string description = l_trimmed.Substring(0, position_guid_begin).Trim();
+					string guid_project_type = l_trimmed.Substring(position_guid_begin + 1, position_guid_end - position_guid_begin - 1);
+				}
+
+			}
 			return pt;
 		}
 
@@ -90,7 +107,7 @@ namespace HolisticWare.IDE.VisualStudio
 			Legacy (2003) Smart Device (C#)	{20D4826A-C6FA-45DB-90F4-C717570B9F32}
 			Legacy (2003) Smart Device (VB.NET)	{CB4CE8C6-1BDB-4DC7-A4D3-65A1999772F8}
 
-			Extensibility	
+			//Extensibility	
 
 			SharePoint (C#)	{593B0543-81F6-4436-BA1E-4747859CAAE2}
 			SharePoint (VB.NET)	{EC05E597-79D4-47f3-ADA0-324C4F7C7484}
@@ -190,7 +207,7 @@ namespace HolisticWare.IDE.VisualStudio
 			vs2013 c# wp8.1 panorama app {C089C8C0-30E0-4E22-80C0-CE093F111A43}
 			vs2013 c# wp8.1 phoneapp {C089C8C0-30E0-4E22-80C0-CE093F111A43}
 			vs2013 c# wp8.1 pivotapp {76F1466A-8B6D-4E39-A767-685A06062A39}
-			vs2013 c# wp8.1 webview app {76F1466A-8B6D-4E39-A767-685A06062A39]
+			vs2013 c# wp8.1 webview app {76F1466A-8B6D-4E39-A767-685A06062A39}
 
 			vs2013 vb wp8 blank app {76F1466A-8B6D-4E39-A767-685A06062A39}
 			vs2013 vb wp8 databound app {DB03555F-0C8B-43BE-9FF9-57896B3C5E56}

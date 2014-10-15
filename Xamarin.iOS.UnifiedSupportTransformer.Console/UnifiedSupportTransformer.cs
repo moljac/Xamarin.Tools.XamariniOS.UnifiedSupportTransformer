@@ -168,31 +168,28 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 				Console.ForegroundColor = ConsoleColor.Green;
 				Console.WriteLine (@"\t\t ProjectTypeGuids = iOS Unified Library / App");
 			}
+			else if (node_type_project_guid.InnerText.Contains ("{F5B4F3BC-B597-4E2B-B552-EF5D8A32436F}"))
+			{
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine (@"\t\t ProjectTypeGuids = iOS Binding (Classic & Unified)");
+				node_type_project_guid.InnerText = "{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
+			}
+			else if (node_type_project_guid.InnerText.Contains ("{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}"))
+			{
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine (@"\t\t ProjectTypeGuids = iOS Unified App Extension");
+			}
+			else if (node_type_project_guid.InnerText.Contains ("{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"))
+			{
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine (@"\t\t ProjectTypeGuids = Already Converted");
+			}
 			else
-				if (node_type_project_guid.InnerText.Contains ("{F5B4F3BC-B597-4E2B-B552-EF5D8A32436F}"))
-				{
-					Console.ForegroundColor = ConsoleColor.Green;
-					Console.WriteLine (@"\t\t ProjectTypeGuids = iOS Binding (Classic & Unified)");
-					node_type_project_guid.InnerText = "{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
-				}
-				else
-					if (node_type_project_guid.InnerText.Contains ("{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}"))
-					{
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.WriteLine (@"\t\t ProjectTypeGuids = iOS Unified App Extension");
-					}
-					else
-						if (node_type_project_guid.InnerText.Contains ("{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"))
-						{
-							Console.ForegroundColor = ConsoleColor.Yellow;
-							Console.WriteLine (@"\t\t ProjectTypeGuids = Already Converted");
-						}
-						else
-						{
-							Console.ForegroundColor = ConsoleColor.Red;
-							Console.WriteLine (@"\t\t Unknown ProjectTypeGuids = " + node_type_project_guid.InnerText);
-							node_type_project_guid.InnerText = "{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
-						}
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine (@"\t\t Unknown ProjectTypeGuids = " + node_type_project_guid.InnerText);
+				node_type_project_guid.InnerText = "{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
+			}
 			Console.ResetColor ();
 			//---------------------------------------------------------------------
 			//---------------------------------------------------------------------
@@ -224,32 +221,92 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 			{
 				XmlNode n = property_groups [i];
 				XmlAttribute xa = n.Attributes ["Condition"];
-				if (null != xa && xa.InnerText.Contains ("Release"))
+
+				string configuration_platform = null;
+
+				if (null != xa)
 				{
-					//Create a new node.
-					XmlElement elem = doc.CreateElement ("DefineConstants", xmlns_dummy);
-					elem.InnerText = "__UNIFIED__;";
-					//Add the node to the document.
-					n.InsertAfter (elem, n.LastChild);
-				}
-				if (null != xa && (xa.InnerText.Contains ("Release") || xa.InnerText.Contains ("Debug") || xa.InnerText.Contains ("AdHoc") || xa.InnerText.Contains ("AppStore") || xa.InnerText.Contains ("Ad-Hoc")))
-				{
+					configuration_platform = xa.InnerText;
+					string configuration = null;
+					string platform = null;
+
+					string[] configurations =
+						new[]
+						{
+							"Debug"
+						,	"Release"
+						};
+					foreach (string s in configurations)
+					{
+						if (configuration_platform.Contains(s))
+						{
+							configuration = s;
+						}
+					}
+
+					string[] platforms =
+						new[]
+						{
+							"AnyCPU"
+						,	"iPhone"
+						,	"iPhoneSimulator"
+						,	"AppStore"
+						,	"Ad-Hoc"
+						,	"AdHoc"
+						};
+
+					foreach (string s in platforms)
+					{
+						if (configuration_platform.Contains(s))
+						{
+							platform = s;
+						}
+					}
+
 					string node_name = "";
 					XmlElement elem = null;
+
+					string ios_api = "unified";
+
+					// http://msdn.microsoft.com/en-us/library/bb629394.aspx
 					//......................................................
-					node_name = "IntermediateOutputPath";
-					elem = doc.CreateElement (node_name, xmlns_dummy);
-					elem.InnerText = @"obj\unified\%24%28Platform%29\%24%28Configuration%29\";
-					//Add the node to the document.
-					n.InsertAfter (elem, n.LastChild);
-					//......................................................
-					//......................................................
+					// Specifies the path to the output directory, relative to the project 
+					// directory, for example, "bin\Debug".
 					node_name = "OutputPath";
-					elem = doc.CreateElement (node_name, xmlns_dummy);
-					elem.InnerText = @"bin\unified\%24%28Platform%29\%24%28Configuration%29\";
+					elem = doc.CreateElement(node_name, xmlns_dummy);
+					elem.InnerText =
+								//@"bin\classic\%24%28Platform%29\%24%28Configuration%29\"
+								@"bin\" + ios_api + @"\" + platform + @"\" + configuration
+								;
 					//Add the node to the document.
-					n.InsertAfter (elem, n.LastChild);
+					n.InsertAfter(elem, n.LastChild);
 					//......................................................
+
+					//......................................................
+					// The top-level folder where all configuration-specific intermediate output 
+					// folders are created. The default value is obj\. 
+					// The following code is an example: 
+					// <BaseIntermediateOutputPath>c:\xyz\obj\</BaseIntermediateOutputPath>
+
+					node_name = "BaseIntermediateOutputPath";
+					elem = doc.CreateElement(node_name, xmlns_dummy);
+					elem.InnerText = @"obj\" + ios_api + @"\";
+					//Add the node to the document.
+					n.InsertAfter(elem, n.LastChild);
+					//......................................................
+					//......................................................
+					// The full intermediate output path as derived from BaseIntermediateOutputPath, 
+					// if no path is specified. For example, \obj\debug\. If this property is overridden, 
+					// then setting BaseIntermediateOutputPath has no effect.
+					node_name = "IntermediateOutputPath";
+					elem = doc.CreateElement(node_name, xmlns_dummy);
+					elem.InnerText =
+								//@"obj\classic\%24%28Platform%29\%24%28Configuration%29\"
+								@"obj\" + ios_api + @"\" + platform + @"\" + configuration;
+								;
+					//Add the node to the document.
+					n.InsertAfter(elem, n.LastChild);
+					//......................................................					
 				}
 			}
 			//---------------------------------------------------------------------
@@ -273,24 +330,92 @@ namespace Xamarin.iOS.UnifiedSupportTransformer
 			{
 				XmlNode n = property_groups [i];
 				XmlAttribute xa = n.Attributes ["Condition"];
-				if (null != xa && (xa.InnerText.Contains ("Release") || xa.InnerText.Contains ("Debug") || xa.InnerText.Contains ("AdHoc") || xa.InnerText.Contains ("AppStore") || xa.InnerText.Contains ("Ad-Hoc")))
+
+				string configuration_platform = null;
+
+				if (null != xa)
 				{
+					configuration_platform = xa.InnerText;
+					string configuration = null;
+					string platform = null;
+
+					string[] configurations =
+						new[]
+						{
+							"Debug"
+						,	"Release"
+						};
+					foreach (string s in configurations)
+					{
+						if (configuration_platform.Contains(s))
+						{
+							configuration = s;
+						}
+					}
+
+					string[] platforms =
+						new[]
+						{
+							"AnyCPU"
+						,	"iPhone"
+						,	"iPhoneSimulator"
+						,	"AppStore"
+						,	"Ad-Hoc"
+						,	"AdHoc"
+						};
+
+					foreach (string s in platforms)
+					{
+						if (configuration_platform.Contains(s))
+						{
+							platform = s;
+						}
+					}
+
 					string node_name = "";
 					XmlElement elem = null;
+
+					string ios_api = "classic";
+
+					// http://msdn.microsoft.com/en-us/library/bb629394.aspx
 					//......................................................
-					node_name = "IntermediateOutputPath";
-					elem = doc.CreateElement (node_name, xmlns_dummy);
-					elem.InnerText = @"obj\classic\%24%28Platform%29\%24%28Configuration%29\";
-					//Add the node to the document.
-					n.InsertAfter (elem, n.LastChild);
-					//......................................................
-					//......................................................
+					// Specifies the path to the output directory, relative to the project 
+					// directory, for example, "bin\Debug".
 					node_name = "OutputPath";
 					elem = doc.CreateElement (node_name, xmlns_dummy);
-					elem.InnerText = @"bin\classic\%24%28Platform%29\%24%28Configuration%29\";
+					elem.InnerText =
+								//@"bin\classic\%24%28Platform%29\%24%28Configuration%29\"
+								@"bin\" +  ios_api + @"\" + platform + @"\" + configuration
+								;
 					//Add the node to the document.
 					n.InsertAfter (elem, n.LastChild);
 					//......................................................
+
+					//......................................................
+					// The top-level folder where all configuration-specific intermediate output 
+					// folders are created. The default value is obj\. 
+					// The following code is an example: 
+					// <BaseIntermediateOutputPath>c:\xyz\obj\</BaseIntermediateOutputPath>
+
+					node_name = "BaseIntermediateOutputPath";
+					elem = doc.CreateElement (node_name, xmlns_dummy);
+					elem.InnerText = @"obj\" + ios_api + @"\";
+					//Add the node to the document.
+					n.InsertAfter (elem, n.LastChild);
+					//......................................................
+					//......................................................
+					// The full intermediate output path as derived from BaseIntermediateOutputPath, 
+					// if no path is specified. For example, \obj\debug\. If this property is overridden, 
+					// then setting BaseIntermediateOutputPath has no effect.
+					node_name = "IntermediateOutputPath";
+					elem = doc.CreateElement(node_name, xmlns_dummy);
+					elem.InnerText =
+								//@"obj\classic\%24%28Platform%29\%24%28Configuration%29\"
+								@"obj\" + ios_api + @"\" + platform + @"\" + configuration;
+								;
+					//Add the node to the document.
+					n.InsertAfter(elem, n.LastChild);
+					//......................................................					
 				}
 			}
 			//---------------------------------------------------------------------
